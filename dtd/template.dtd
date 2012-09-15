@@ -1,0 +1,15 @@
+<!--
+ template DTD
+ http://www.btboys.com/template/
+-->
+<!ELEMENT template (name,version,minversion,sidebar,templatesite?,description?,author?,authorsite?,email?)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT templatesite (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT minversion (#PCDATA)>
+<!ELEMENT sidebar (#PCDATA)>
+<!ELEMENT author (#PCDATA)>
+<!ELEMENT authorsite (#PCDATA)>
+<!ELEMENT email (#PCDATA)>
+

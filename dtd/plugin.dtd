@@ -1,0 +1,15 @@
+<!--
+ plugin DTD
+ http://www.btboys.com/plugin/
+-->
+<!ELEMENT plugin (maincalss,name,version,minversion,pluginsite?,description?,author?,authorsite?,email?)>
+<!ELEMENT maincalss (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT pluginsite (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT minversion (#PCDATA)>
+<!ELEMENT author (#PCDATA)>
+<!ELEMENT authorsite (#PCDATA)>
+<!ELEMENT email (#PCDATA)>
+
