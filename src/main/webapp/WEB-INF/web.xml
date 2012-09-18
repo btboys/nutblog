@@ -22,7 +22,7 @@
 	</filter-mapping>
 	
 	<!-- UrlRewriteFilter配置 -->
-	<filter>
+	 <filter>
 		<filter-name>UrlRewriteFilter</filter-name>
 		<filter-class> org.gson.nutblog.ext.UrlRewriteFilter</filter-class>
 	</filter>
@@ -30,6 +30,7 @@
 		<filter-name>UrlRewriteFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
 	</filter-mapping>
 
 </web-app>

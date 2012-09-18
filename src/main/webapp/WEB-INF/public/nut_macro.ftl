@@ -9,3 +9,7 @@
 		</#list>
 	</#if>
 </#macro>
+
+<#macro INCLUDE path>
+	<#include TMP_REAL_PATH+path>
+</#macro>

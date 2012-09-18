@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
-
 import org.gson.nutblog.plugin.Hooks;
 import org.gson.nutblog.plugin.internal.Index2Plugin;
 import org.gson.nutblog.plugin.internal.IndexPlugin;
@@ -19,13 +17,11 @@ import org.gson.nutblog.util.Utils;
 import org.nutz.lang.Files;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
-import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.NutConfig;
 import org.nutz.mvc.Setup;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModelException;
 
 public class MvcSetup implements Setup {
@@ -50,34 +46,27 @@ public class MvcSetup implements Setup {
 		Cache c = Cache.getInstance();
 		c.updateCache();
 		
-		setConfiguration();
-		if(Utils.cfg != null){
-			Utils.cfg.setAutoIncludes(Arrays.asList("nut_macro.ftl"));
-			try {
-				Utils.cfg.setSharedVariable("hooks", Hooks.getListHooks());
-			} catch (TemplateModelException e) {
-				log.error("插件挂载点初始化失败！TemplateModelException:"+e.getMessage());
-			}
-		}
+		initFreemarkerConfiguration();
+		
+		Utils.cfg.setServletContextForTemplateLoading(nc.getServletContext(), "/WEB-INF/");
 	}
 	
-	private void setConfiguration() {
-		Configuration config = (Configuration) Mvcs.getServletContext().getAttribute(CONFIG_SERVLET_CONTEXT_KEY);
-		if (config == null) {
-			config = new Configuration();
-			config.setServletContextForTemplateLoading(Mvcs.getServletContext(), "/");
-			config.setDefaultEncoding("UTF-8");
-			config.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-			// 读取freemarker配置文件
-			loadSettings(Mvcs.getServletContext(), config);
-
-			Mvcs.getServletContext().setAttribute(CONFIG_SERVLET_CONTEXT_KEY, config);
-		}
+	private void initFreemarkerConfiguration() {
+		Configuration config = new Configuration();
+		config.setDefaultEncoding("UTF-8");
 		config.setWhitespaceStripping(true);
+		loadSettings(config);
+		
+		config.setAutoIncludes(Arrays.asList("public/nut_macro.ftl"));
+		try {
+			config.setSharedVariable("hooks", Hooks.getListHooks());
+		} catch (TemplateModelException e) {
+			log.error("插件挂载点初始化失败！TemplateModelException:"+e.getMessage());
+		}
 		Utils.cfg = config;
 	}
 
-	private void loadSettings(ServletContext servletContext, Configuration config) {
+	private void loadSettings(Configuration config) {
 		log.debug("开始读取："+CONFIG_SERVLET_CONTEXT_KEY);
 		InputStream in = null;
 		try {

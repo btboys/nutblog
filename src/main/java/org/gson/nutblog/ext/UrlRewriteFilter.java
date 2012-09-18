@@ -65,8 +65,14 @@ public class UrlRewriteFilter implements Filter {
 		///%category%/%post_id%.html record/postname
 		
 		if(path.getPath().endsWith("/") || Strings.isEmpty(path.getSuffix())){
-			req.getRequestDispatcher(path.getPath()+(path.getPath().endsWith("/")?"":"/")+"index.nut").forward(request, response);
-		}else if(path.getSuffix().toLowerCase().equals("nut") || matcher(path.getSuffix().toLowerCase())){
+			String forward;
+			if(path.getPath().endsWith("/")){
+				forward = path.getPath()+"index.nut";
+			}else{
+				forward = path.getPath()+"/index.nut";
+			}
+			req.getRequestDispatcher(forward).forward(request, response);
+		}else if(matcher(path.getSuffix().toLowerCase())){
 			chain.doFilter(request, response);
 		}else if(path.getSuffix().toLowerCase().equals("html")){
 			String realPath = Mvcs.getServletContext().getRealPath(path.getUrl());
@@ -99,29 +105,43 @@ public class UrlRewriteFilter implements Filter {
 		cfg.setTemplateLoader(new WebappTemplateLoader(sc, templatePath));
 		cfg.setDefaultEncoding("UTF-8");
 		Template t = null;
+		StringWriter sw = new StringWriter();
+		BufferedWriter wt = new BufferedWriter(sw);
+		HashMap<String, Object> root = new HashMap<String, Object>();
 		try {
 			resp.setStatus(404);
 			resp.setContentType("text/html; charset=UTF-8");
-			HashMap<String, Object> root = new HashMap<String, Object>();
 			root.put("path", path.getUrl());
 			t = cfg.getTemplate("404.ftl");
-			StringWriter sw = new StringWriter();
-			BufferedWriter wt = new BufferedWriter(sw);
 			t.process(root, wt);
 			resp.getWriter().write(sw.toString());
-			resp.getWriter().flush();
-			sw.flush();
-			wt.flush();
 		} catch (TemplateException e) {
 			log.info("渲染失败！TemplateException：" + e.getMessage());
 			resp.setStatus(500);
-			req.setAttribute("path",  path.getUrl());
-			req.getRequestDispatcher("/WEB-INF/public/error.jsp").forward(req, resp);
+			cfg.setTemplateLoader(new WebappTemplateLoader(sc, "/WEB-INF/public/"));
+			t = cfg.getTemplate("error.ftl");
+			try {
+				t.process(root, wt);
+				resp.getWriter().write(sw.toString());
+			} catch (TemplateException e1) {
+				log.info("渲染失败！TemplateException：" + e1.getMessage());
+				resp.getWriter().write( e1.getMessage());
+			}
 		} catch (FileNotFoundException e) {
 			log.info("404渲染失败！IOException：" + e.getMessage());
 			resp.setStatus(404);
-			req.setAttribute("path",  path.getUrl());
-			req.getRequestDispatcher("/WEB-INF/public/404.jsp").forward(req, resp);
+			cfg.setTemplateLoader(new WebappTemplateLoader(sc, "/WEB-INF/public/"));
+			t = cfg.getTemplate("404.ftl");
+			try {
+				t.process(root, wt);
+				resp.getWriter().write(sw.toString());
+			} catch (TemplateException e1) {
+				log.info("渲染失败！TemplateException：" + e1.getMessage());
+				resp.getWriter().write( e1.getMessage());
+			}
+		}finally{
+			sw.flush();
+			wt.flush();
 		}
 	}
 

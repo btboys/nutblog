@@ -11,9 +11,9 @@ public final class Constant {
 	
 	public static String BASE_PAKG = "org.gson.nutblog";
 	
-	public static String TMP_ROOT_PATH = "/WEB-INF/content/templates/";
+	public static String TMP_ROOT_PATH = "content/templates/";
 	
-	public static String ADMIN_TMP_ROOT_PATH = "/WEB-INF/admin/";
+	public static String ADMIN_TMP_ROOT_PATH = "admin/";
 	
 	public static String KEY_VERSION = "version";
 	

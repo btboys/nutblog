@@ -21,7 +21,6 @@ import org.nutz.log.Logs;
 import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.View;
 
-import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -30,15 +29,21 @@ public class FreemarkerView implements View {
 	
 	private static final String SESSION = "session";
 	private static final String APPLICATION = "application";
+	private static final String PARAMS = "params";
+	public static final String REQUEST = "request";
+	
 	private String tpNames;
 	private String tplName;
 	private ServletContext sc;
+	private String templateName;
+	private String templatePath;
 	
 	public static final String OBJ = "obj";
-	public static final String REQUEST = "request";
-	public static final String BASE = "basePath";
-	public static final String TMP_PATH = "templatesPath";
+	public static final String BASE = "BLOG_URL";
+	public static final String TMP_PATH = "TEM_URL";
+	private static final String TMP_REAL_PATH = "TMP_REAL_PATH";
 
+	
 
 	public FreemarkerView(String tpName) {
 		this.tpNames = tpName+".ftl";
@@ -46,20 +51,19 @@ public class FreemarkerView implements View {
 	}
 
 	public void render(HttpServletRequest request, HttpServletResponse response, Object value) throws Throwable {
-		String templateName = sc.getAttribute(Constant.KEY_TEMPLATENAME).toString();
-		String templatePath = Constant.TMP_ROOT_PATH + templateName+"/";
+		templateName = sc.getAttribute(Constant.KEY_TEMPLATENAME).toString();
+		templatePath = Constant.TMP_ROOT_PATH + templateName+"/";
 		
 		tplName = this.tpNames;
 		if(tplName.startsWith("admin:")){
 			tplName = tplName.replace("admin:", "");
 			templatePath = Constant.ADMIN_TMP_ROOT_PATH;
 		}
-		Utils.cfg.setTemplateLoader(new WebappTemplateLoader(sc, templatePath));
-		String realPath = sc.getRealPath(templatePath);
+		
+		String realPath = sc.getRealPath("/WEB-INF/"+templatePath);
 		
 		if(Utils.fileExists(realPath) && Utils.fileExists(realPath+"\\"+tplName)){
-			//Utils.cfg.setDirectoryForTemplateLoading(new File(realPath));
-			outPut(request, response, value, sc, templateName, templatePath);
+			outPut(request, response, value, sc);
 		}else{
 			log.info(templateName+"主题或者主题文件<"+tplName+">不存在！");
 			response.setStatus(500);
@@ -67,33 +71,50 @@ public class FreemarkerView implements View {
 		}
 	}
 
-	private void outPut(HttpServletRequest request, HttpServletResponse response, Object value, ServletContext sc, String templateName, String templatePath) throws TemplateException, IOException, ServletException {
+	private void outPut(HttpServletRequest request, HttpServletResponse response, Object value, ServletContext sc) throws TemplateException, IOException, ServletException {
 		Mvcs.setLocalizationKey(request.getLocale().toString());
 		// 添加数据模型
 		HashMap<String, Object> root = new HashMap<String, Object>();
+		HashMap<String, Object> requestParms = new HashMap<String, Object>();
+		HashMap<String, Object> sessionParms = new HashMap<String, Object>();
+		HashMap<String, Object> applicationParms = new HashMap<String, Object>();
+		
 		root.put(OBJ, value);
-		root.put(REQUEST, request);
-		root.put(SESSION, request.getSession());
-		root.put(APPLICATION, sc);
 		
 		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
 		root.put(BASE, basePath);
 		root.put(TMP_PATH, basePath+"templates/"+templateName+"/");
+		root.put(TMP_REAL_PATH, templatePath);
 		
 		Enumeration<?> reqs = request.getAttributeNames();
 		while (reqs.hasMoreElements()) {
 			String strKey = (String) reqs.nextElement();
-			root.put(strKey, request.getAttribute(strKey));
+			requestParms.put(strKey, request.getAttribute(strKey));
 		}
+		root.put(REQUEST, requestParms);
+		
+		Enumeration<?> sess = request.getSession().getAttributeNames();
+		while (sess.hasMoreElements()) {
+			String strKey = (String) sess.nextElement();
+			sessionParms.put(strKey, request.getSession().getAttribute(strKey));
+		}
+		root.put(SESSION, sessionParms);
+		
+		Enumeration<?> scs = sc.getAttributeNames();
+		while (scs.hasMoreElements()) {
+			String strKey = (String) scs.nextElement();
+			applicationParms.put(strKey, sc.getAttribute(strKey));
+		}
+		root.put(APPLICATION, applicationParms);
+		root.put(PARAMS, request.getParameterMap());
+		
 		root.put("options",Cache.getInstance().readCache(Map.class, Cache.OPTIONS));
 		root.put("execHook", TemplateHook.getInstance(root)); 
-		
 		root.put("locale", request.getLocale().toString());
 		
-		Template t = Utils.cfg.getTemplate(tplName);
+		Template t = Utils.cfg.getTemplate(templatePath+tplName);
 		
 		response.setContentType("text/html; charset=" + t.getEncoding());
-		
 		try {
 			StringWriter sw = new StringWriter();
 			BufferedWriter wt = new BufferedWriter(sw);
@@ -108,4 +129,5 @@ public class FreemarkerView implements View {
 			request.getRequestDispatcher("/WEB-INF/public/error.jsp").forward(request, response);
 		}
 	}
+	
 }

@@ -1,7 +1,28 @@
 @CHARSET "UTF-8";
 
-body{
-	padding:0;
+body {
+	padding: 0;
 	margin: 0;
-	padding-top: 45px; 
+	padding-top: 65px;
+}
+
+.footer {
+	text-align: center;
+	height: 30px;
+	line-height: 30px;
+	font-weight: bold;
+}
+
+.s_info{
+	background: whiteSmoke;
+	list-style: none;
+	margin: 0 0;
+}
+.s_info li{
+	padding: 5px 10px;
+	border-bottom: 1px #EFEFEF solid;
+}
+.fast-post{
+	background: whiteSmoke;
+	padding: 5px 10px;
 }

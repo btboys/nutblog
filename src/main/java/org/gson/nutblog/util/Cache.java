@@ -21,7 +21,6 @@ import org.nutz.dao.Sqls;
 import org.nutz.dao.entity.Record;
 import org.nutz.dao.sql.Sql;
 import org.nutz.dao.sql.SqlCallback;
-import org.nutz.ioc.impl.PropertiesProxy;
 import org.nutz.json.Json;
 import org.nutz.json.JsonFormat;
 import org.nutz.lang.Files;
@@ -57,16 +56,9 @@ public final class Cache {
 		if (instance != null) {
 			return instance;
 		}
-		if (Mvcs.getIoc().has("dao")) {
-			dao = Mvcs.getIoc().get(Dao.class, "dao");
-		}
-		if (Mvcs.getIoc().has("config")) {
-			PropertiesProxy pp = Mvcs.getIoc().get(PropertiesProxy.class,
-					"config");
-			prefix = pp.get("db-prefix");
-		}
-		cacheDir = Mvcs.getServletContext().getRealPath(
-				"/WEB-INF/content/cache/");
+		dao = Utils.getDao();
+		prefix = Utils.geDbtPrefix();
+		cacheDir = Mvcs.getServletContext().getRealPath("/WEB-INF/content/cache/");
 		instance = new Cache();
 		return instance;
 	}
@@ -308,8 +300,7 @@ public final class Cache {
 		dao.execute(sqls);
 		return sqls.getList(Record.class);
 	}
-
-
+	
 	private void cacheWrite(Object cacheData, String cacheName) {
 		StringWriter sw = new StringWriter();
 		BufferedWriter bfw = new BufferedWriter(sw);
