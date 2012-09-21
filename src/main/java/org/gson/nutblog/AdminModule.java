@@ -1,9 +1,10 @@
 package org.gson.nutblog;
 
+import org.gson.nutblog.ext.FreemarkerView;
+import org.gson.nutblog.util.Utils;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
-import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.filter.CheckSession;
 
 @At("/admin")
@@ -11,8 +12,17 @@ import org.nutz.mvc.filter.CheckSession;
 public class AdminModule {
 
 	@At
-	@Ok("tp:admin:index")
-	public void index(){
-		
+	public Object index(){
+		Utils.setTopTitle("NutBlog管理");
+		return new FreemarkerView("admin:admin:index");
+	}
+	
+	@At
+	public Object writeLog(){
+		if(!Utils.isPost()){
+			Utils.setTopTitle("撰写新文章");
+			return new FreemarkerView("admin:write_log");
+		}
+		return true;
 	}
 }

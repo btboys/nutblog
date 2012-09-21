@@ -26,3 +26,15 @@ body {
 	background: whiteSmoke;
 	padding: 5px 10px;
 }
+.controls-row{
+	margin-bottom: 10px;
+}
+.baseline{
+	height: 40px;
+}
+.postbtn{
+	position: fixed;
+	z-index: 10000;
+	right: 35px;
+	bottom: 35px;
+}

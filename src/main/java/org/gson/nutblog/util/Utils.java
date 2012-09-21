@@ -148,6 +148,22 @@ public final class Utils {
 	public static <T> T getControler(Class<T> clazz){
 		return Mvcs.getIoc().get(clazz);
 	}
+	
+	/**
+	 * 判断是否是post请求
+	 * @return
+	 */
+	public static Boolean isPost(){
+		return Mvcs.getReq().getMethod().equalsIgnoreCase("post");
+	}
+	
+	/**
+	 * 设置标题
+	 * @param title
+	 */
+	public static void setTopTitle(String title){
+		Mvcs.getReq().setAttribute("topTitle", title);
+	}
 
 	private Utils() {
 	}

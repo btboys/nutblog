@@ -7,21 +7,13 @@
 	<meta name="author" content="nutblog" />
 	<meta name="robots" content="noindex, nofollow">
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
-	<title>NutBlog管理</title>
+	<title>${request.topTitle}</title>
 	<link href="public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<link href="public/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link href="public/style/admin.css" rel="stylesheet">
 	
     <script type="text/javascript" src="public/javascript/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="public/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="public/javascript/jquery.hashable.js"></script>
-    <script type="text/javascript">
-	    $(function(){
-	    	$(window).hashChange(function(newHash,oldHash){
-	    		$(".container").html(newHash+oldHash);
-	    	});
-	    });
-    </script>
   </head>
   <body>
   <div class="navbar navbar-inverse navbar-fixed-top">
@@ -47,7 +39,7 @@
               <li class="dropdown">
                 <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">文章 <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="admin#wirte">写文章</a></li>
+                  <li><a href="admin/writelog.nut">写文章</a></li>
                   <li><a href="admin#draf">草稿</a></li>
                   <li class="divider"></li>
                   <li><a href="admin#sort">分类</a></li>
@@ -95,5 +87,4 @@
         </div>
       </div>
     </div>
-    
     <div class="container">

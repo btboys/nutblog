@@ -77,7 +77,7 @@ public class UrlRewriteFilter implements Filter {
 		}else if(path.getSuffix().toLowerCase().equals("html")){
 			String realPath = Mvcs.getServletContext().getRealPath(path.getUrl());
 			if (Utils.fileExists(realPath)) {
-				req.getRequestDispatcher(path.getUrl()).forward(request, response);
+				chain.doFilter(request, response);
 			}else{
 				path.getPath();
 			}
